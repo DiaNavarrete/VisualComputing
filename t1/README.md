@@ -13,20 +13,20 @@ Implementar al menos 6 ilusiones de tres tipos distintos (paradójicas, geométr
 
 Complete la tabla:
 
-| Integrante | github nick |
-|------------|-------------|
-|            |             |
+|       Integrante       | github nick |
+|------------------------|-------------|
+|Diana Navarrete Ramirez |DiaNavarrete |
 
 ## Discusión
 
 1. Complete la la tabla
 
-| Ilusión | Categoria | Referencia | Tipo de interactividad (si aplica) | URL código base (si aplica) |
-|---------|-----------|------------|------------------------------------|-----------------------------|
-|         |           |            |                                    |                             |
-|         |           |            |                                    |                             |
-|         |           |            |                                    |                             |
-|         |           |            |                                    |                             |
+|     Ilusión    | Categoria  | Referencia |   Tipo de interactividad (si aplica)   | URL código base (si aplica) |
+|----------------|------------|------------|----------------------------------------|-----------------------------|
+| Cafe-Wall      | geométrica | presentacion clase | Movimiento horizontal mouse    |                             |
+| Wagon Whell    | movimiento | presentacion clase |                -               |                             |
+| Cubo imposible | ambigua    | presentacion clase | Mouse click izquierdo          |                             |
+| Calabera       | ambigua    | [ilusion](http://www.michaelbach.de/ot/cog-blureffects/index.html) [imagen](http://www.fotoshumor.com/gratis/ilusion_optica) | Girar rueda del mouse (boton 3)|                             |
 |         |           |            |                                    |                             |
 |         |           |            |                                    |                             |
 
