@@ -80,6 +80,7 @@ void triangleRaster() {
   // here we convert v1 to illustrate the idea
   if (debug) {
     pushStyle();
+  strokeWeight(0);
     stroke(255, 255, 0, 125);
     float v1x= (frame.location(v1).x());
     float v1y= (frame.location(v1).y());
@@ -87,28 +88,51 @@ void triangleRaster() {
     float v2y= (frame.location(v2).y());
     float v3x= (frame.location(v3).x());
     float v3y= (frame.location(v3).y());
-    float v1z= (scene.eye().location(v1).z());
-    float v2z= (scene.eye().location(v2).z());
-    float v3z= (scene.eye().location(v3).z());
+    float v1z= (scene.eye().location(v1).z())*-1;
+    float v2z= (scene.eye().location(v2).z())*-1;
+    float v3z= (scene.eye().location(v3).z())*-1;
+        
+    FloatList depthBuffer=new FloatList();
+    for(int i=0; i<width*height;i++){
+      depthBuffer.append(1000);
+    }
+    float alia=0.25;
+    float cant= 1/alia;
     point(0,0);
-    println(v1z,v2z,v3z);
     int maxx=round(max(v1x,v2x,v3x));
     int maxy=round(max(v1y,v2y,v3y));
     int minx=round(min(v1x,v2x,v3x));
     int miny=round(min(v1y,v2y,v3y));
-
-    for(int x= minx; x<=maxx; x++){
-      for(int y= miny; y<=maxy; y++){
-        float w1= edgeFunction(v1x,v1y, v2x, v2y, x+0.5, y+0.5); 
-        float w2= edgeFunction(v2x, v2y, v3x, v3y, x+0.5, y+0.5); 
-        float w3= edgeFunction(v3x, v3y, v1x,v1y, x+0.5, y+0.5);
-        if(w1 >= 0 && w2 >= 0 && w3 >= 0){
-          float area=w1+w2+w3;
-          w1=w1/area;
-          w2=w2/area;
-          w3=w3/area;
-          float oneOverZ= v1z * w1 + v2z * w2 + v3z * w3;
-          //rect(x, y,1,1);
+    int s=round(width/pow(2, n));
+    for(int px= minx; px<=maxx; px++){
+      for(int py= miny; py<=maxy; py++){
+          
+          boolean dentro=false;
+          float c1=0;
+          float c2=0;
+          float c3=0;
+          for(float x= px; x<px+1; x+=alia){//antialiasing
+            for(float y= py; y<py+1; y+=alia){
+              float w1= edgeFunction(v1x,v1y, v2x, v2y, x, y); 
+              float w2= edgeFunction(v2x, v2y, v3x, v3y, x, y); 
+              float w3= edgeFunction(v3x, v3y, v1x,v1y, x, y);
+              if(w1 >= 0 && w2 >= 0 && w3 >= 0){
+                dentro=true;
+                float area=w1+w2+w3;
+                c1+=w1/area;
+                c2+=w2/area;
+                c3+=w3/area;
+              }                  
+            }
+          }
+          if(dentro){
+            fill((c1/cant)*255, (c2/cant)*255, (c3/cant)*255);
+            rect(px, py,1,1);
+            
+            float z= v1z * c1 + v2z * c2 + v3z * c3;
+            if(z< depthBuffer.get((height/2+py)*s+(width/2+px))){
+              depthBuffer.set((height/2+py)*s+(width/2+px),z);
+            }
         }
       }
     }
@@ -123,40 +147,6 @@ float edgeFunction(float ax, float ay, float bx, float by, float px, float py)
   float ppx=px;
   float ppy=py;
   return ((ppx - ax) * (by - ay) - (ppy - ay) * (bx - ax)); 
-}
-
-boolean isInside(float ax, float ay, float az, float bx, float by, float bz, float cx, float cy, float cz, int px, int py){
-  int w1= round(edgeFunction(ax,ay, bx, by, px+0.5, py+0.5)); 
-  int w2= round(edgeFunction(bx, by, cx, cy, px+0.5, py+0.5)); 
-  int w3= round(edgeFunction(cx, cy, ax,ay, px+0.5, py+0.5));
-    
-  float a=(w1+w2+w3)/2;  //area
-  float c1=(w1*255/a);
-  float c2=(w2*255/a);
-  float c3=(w3*255/a);
-  
-  stroke(c1,c2,c3,125);
-  
-  float zz=scene.eye().position().z();
-  float oneOverZ= zz * w1 + zz * w2 + zz * w3;
-  float z= 1/ oneOverZ;
- /* for (float yy = ay; yy <= ay+1;  yy+=1/n) { 
-    for (float xx = ax; xx <= ax+1; xx+=1/n) { 
-   
-      if(z< depthBuffer[ yy * width + xx]){
-        depthBuffer[ yy * width + xx] = z;
-      }
-    }
-  }*/
-  //prueba mia
-  if( w1 ==0 || w2 ==0 ||  w3 ==0){   /// si esta en el borde
-    
-    stroke(0,0,0,125);
-    return true;
-  }
-  
-  return (w1 >= 0 && w2 >= 0 && w3 >= 0);
- 
 }
 
 void randomizeTriangle() {
