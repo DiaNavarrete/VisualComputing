@@ -87,7 +87,11 @@ void triangleRaster() {
     float v2y= (frame.location(v2).y());
     float v3x= (frame.location(v3).x());
     float v3y= (frame.location(v3).y());
+    float v1z= (scene.eye().location(v1).z());
+    float v2z= (scene.eye().location(v2).z());
+    float v3z= (scene.eye().location(v3).z());
     point(0,0);
+    println(v1z,v2z,v3z);
     int maxx=round(max(v1x,v2x,v3x));
     int maxy=round(max(v1y,v2y,v3y));
     int minx=round(min(v1x,v2x,v3x));
@@ -95,8 +99,16 @@ void triangleRaster() {
 
     for(int x= minx; x<=maxx; x++){
       for(int y= miny; y<=maxy; y++){
-        if(isInside(v1x,v1y,v2x,v2y,v3x,v3y,x,y)){
-          rect(x, y,1,1);
+        float w1= edgeFunction(v1x,v1y, v2x, v2y, x+0.5, y+0.5); 
+        float w2= edgeFunction(v2x, v2y, v3x, v3y, x+0.5, y+0.5); 
+        float w3= edgeFunction(v3x, v3y, v1x,v1y, x+0.5, y+0.5);
+        if(w1 >= 0 && w2 >= 0 && w3 >= 0){
+          float area=w1+w2+w3;
+          w1=w1/area;
+          w2=w2/area;
+          w3=w3/area;
+          float oneOverZ= v1z * w1 + v2z * w2 + v3z * w3;
+          //rect(x, y,1,1);
         }
       }
     }
@@ -113,7 +125,7 @@ float edgeFunction(float ax, float ay, float bx, float by, float px, float py)
   return ((ppx - ax) * (by - ay) - (ppy - ay) * (bx - ax)); 
 }
 
-boolean isInside(float ax, float ay, float bx, float by, float cx, float cy, int px, int py){
+boolean isInside(float ax, float ay, float az, float bx, float by, float bz, float cx, float cy, float cz, int px, int py){
   int w1= round(edgeFunction(ax,ay, bx, by, px+0.5, py+0.5)); 
   int w2= round(edgeFunction(bx, by, cx, cy, px+0.5, py+0.5)); 
   int w3= round(edgeFunction(cx, cy, ax,ay, px+0.5, py+0.5));
