@@ -1,3 +1,6 @@
+  
+import java.util.Map;
+
 class Boid {
   public Frame frame;
   // fields
@@ -9,6 +12,9 @@ class Boid {
   float sc = 3; // scale factor for the render of the boid
   float flap = 0;
   float t = 0;
+  
+    
+  HashMap<IntList, IntList> vertexVertex;
 
   Boid(Vector inPos) {
     position = new Vector();
@@ -27,6 +33,7 @@ class Boid {
     velocity = new Vector(random(-1, 1), random(-1, 1), random(1, -1));
     acceleration = new Vector(0, 0, 0);
     neighborhoodRadius = 100;
+  
   }
 
   public void run(ArrayList<Boid> bl) {
@@ -151,7 +158,23 @@ class Boid {
       stroke(color(255, 0, 0));
       fill(color(255, 0, 0));
     }
+    
+    vertexVertex= new HashMap<IntList,IntList>();
+    vertexVertex.put(new IntList(3 * sc, 0, 0), new IntList());
+    vertexVertex.put(new IntList(-3 * sc, 2 * sc, 0), new IntList());
+    vertexVertex.put(new IntList(-3 * sc, -2 * sc, 0), new IntList());
 
+    vertexVertex.put(new IntList(3 * sc, 0, 0), new IntList());
+    vertexVertex.put(new IntList(-3 * sc, 2 * sc, 0), new IntList());
+    vertexVertex.put(new IntList(-3 * sc, 0, 2 * sc), new IntList());
+
+    vertexVertex.put(new IntList(3 * sc, 0, 0), new IntList());
+    vertexVertex.put(new IntList(-3 * sc, 0, 2 * sc), new IntList());
+    vertexVertex.put(new IntList(-3 * sc, -2 * sc, 0), new IntList());
+
+    vertexVertex.put(new IntList(-3 * sc, 0, 2 * sc), new IntList());
+    vertexVertex.put(new IntList(-3 * sc, 2 * sc, 0), new IntList());
+    vertexVertex.put(new IntList(-3 * sc, -2 * sc, 0), new IntList());
     //draw boid
     beginShape(TRIANGLES);
     vertex(3 * sc, 0, 0);
