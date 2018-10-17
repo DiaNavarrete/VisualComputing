@@ -14,7 +14,7 @@ class Boid {
   float t = 0;
   
     
-  HashMap<IntList, IntList> vertexVertex;
+  HashMap<String,ArrayList<IntList>> vertexVertex;
 
   Boid(Vector inPos) {
     position = new Vector();
@@ -159,7 +159,7 @@ class Boid {
       fill(color(255, 0, 0));
     }
     
-    vertexVertex= new HashMap<IntList,IntList>();
+    vertexVertex= new HashMap<String,IntList,IntList>();
     vertexVertex.put(new IntList(3 * sc, 0, 0), new IntList());
     vertexVertex.put(new IntList(-3 * sc, 2 * sc, 0), new IntList());
     vertexVertex.put(new IntList(-3 * sc, -2 * sc, 0), new IntList());
@@ -175,6 +175,7 @@ class Boid {
     vertexVertex.put(new IntList(-3 * sc, 0, 2 * sc), new IntList());
     vertexVertex.put(new IntList(-3 * sc, 2 * sc, 0), new IntList());
     vertexVertex.put(new IntList(-3 * sc, -2 * sc, 0), new IntList());
+    println(vertexVertex.get(0));
     //draw boid
     beginShape(TRIANGLES);
     vertex(3 * sc, 0, 0);
