@@ -13,10 +13,16 @@ class Boid {
   float flap = 0;
   float t = 0;
   
+  //variables de representacion y render
+  boolean representation, renderMode; 
+  VertexVertex vv;
+  FaceVertex fv;
+  PShape shapeBoid;
     
-  HashMap<IntList, IntList> vertexVertex;
 
-  Boid(Vector inPos) {
+  Boid(Vector inPos, boolean rep, boolean render) {
+    this.representation= rep;
+    this.renderMode=render;
     position = new Vector();
     position.set(inPos);
     frame = new Frame(scene) {
@@ -159,24 +165,14 @@ class Boid {
       fill(color(255, 0, 0));
     }
     
-    vertexVertex= new HashMap<IntList,IntList>();
-    vertexVertex.put(new IntList(3 * sc, 0, 0), new IntList());
-    vertexVertex.put(new IntList(-3 * sc, 2 * sc, 0), new IntList());
-    vertexVertex.put(new IntList(-3 * sc, -2 * sc, 0), new IntList());
-
-    vertexVertex.put(new IntList(3 * sc, 0, 0), new IntList());
-    vertexVertex.put(new IntList(-3 * sc, 2 * sc, 0), new IntList());
-    vertexVertex.put(new IntList(-3 * sc, 0, 2 * sc), new IntList());
-
-    vertexVertex.put(new IntList(3 * sc, 0, 0), new IntList());
-    vertexVertex.put(new IntList(-3 * sc, 0, 2 * sc), new IntList());
-    vertexVertex.put(new IntList(-3 * sc, -2 * sc, 0), new IntList());
-
-    vertexVertex.put(new IntList(-3 * sc, 0, 2 * sc), new IntList());
-    vertexVertex.put(new IntList(-3 * sc, 2 * sc, 0), new IntList());
-    vertexVertex.put(new IntList(-3 * sc, -2 * sc, 0), new IntList());
+    
+    if(representation) renderVV();   // si es true representation => VertexVertex
+    else renderFV();    //si es false representation => FaceVertex
+    if (!renderMode){  //si render modo retenido
+      shape(shapeBoid);
+    }
     //draw boid
-    beginShape(TRIANGLES);
+  /*  beginShape(TRIANGLES);
     vertex(3 * sc, 0, 0);
     vertex(-3 * sc, 2 * sc, 0);
     vertex(-3 * sc, -2 * sc, 0);
@@ -194,6 +190,40 @@ class Boid {
     vertex(-3 * sc, -2 * sc, 0);
     endShape();
 
-    popStyle();
+    popStyle();*/
+  }
+  
+  void renderVV(){    
+    vv= new VertexVertex(createVertexList());// crea la representacion vertexVertex
+    if(renderMode){  // si renderMode es true => render modo inmediato
+      vv.renderInmediate();
+    }
+    else{   // si renderMode es false => render modo retenido
+      this.shapeBoid= vv.renderRetained();
+    }
+  }
+  
+  void renderFV(){
+    ArrayList<Vertex> vertexList= createVertexList();
+    ArrayList<Face> faceList= new ArrayList<Face>();  // agrega las caras
+    faceList.add(new Face(vertexList.get(1).vertex,vertexList.get(2).vertex,vertexList.get(3).vertex));
+    faceList.add(new Face(vertexList.get(0).vertex,vertexList.get(2).vertex,vertexList.get(3).vertex));
+    faceList.add(new Face(vertexList.get(0).vertex,vertexList.get(1).vertex,vertexList.get(3).vertex));
+    faceList.add(new Face(vertexList.get(0).vertex,vertexList.get(1).vertex,vertexList.get(2).vertex));
+    fv= new FaceVertex(vertexList, faceList);  // crea la representacion faceVertex
+    if(renderMode){  // si renderMode es true => render modo inmediato
+      fv.renderInmediate();
+    }
+    else{   // si renderMode es false => render modo retenido
+      this.shapeBoid= fv.renderRetained();
+    }
+  }
+  ArrayList<Vertex> createVertexList(){   
+    ArrayList<Vertex> vertexList= new ArrayList<Vertex>();
+    vertexList.add(new Vertex(new Vector(3 * sc, 0, 0),new IntList(1,2,3)));    //Vertex 0
+    vertexList.add(new Vertex(new Vector(-3 * sc, 2 * sc, 0), new IntList(0,2,3)));  //Vertex 1
+    vertexList.add(new Vertex(new Vector(-3 * sc, -2 * sc, 0), new IntList(0,1,3)));  //Vertex 2
+    vertexList.add(new Vertex(new Vector(-3 * sc, 0, 2 * sc), new IntList(0,1,2)));  //Vertex 3
+    return vertexList;
   }
 }

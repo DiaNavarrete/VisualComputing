@@ -26,9 +26,9 @@ Complete la tabla:
 
 | Integrante | github nick |
 |------------|-------------|
-|            |             |
+| Diana Navarrete Ramirez| DiaNavarrete |
 
-## Entrega
+## Comandos agregados
+[r] cambia tipo de representación, disponible VertexVertex y FaceVertex, por defecto VertexVertex.
+[m] cambia modo de renderización, por defecto inmediato.
 
-* Subir el código al repositorio de la materia antes del 14/10/18 a las 24h.
-* Presentar el trabajo en la clase del 17/10/18 o 18/10/18.
