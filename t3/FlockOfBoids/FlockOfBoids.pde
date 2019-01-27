@@ -38,6 +38,9 @@ ArrayList<Boid> flock;
 Frame avatar;
 boolean animate = true;
 
+boolean representation=true; //VertexVertex //false=> FaceVertex
+boolean renderMode=true; //inmediato // false=> retenido 
+
 void setup() {
   size(1000, 800, P3D);
   scene = new Scene(this);
@@ -48,7 +51,8 @@ void setup() {
   // create and fill the list of boids
   flock = new ArrayList();
   for (int i = 0; i < initBoidNum; i++)
-    flock.add(new Boid(new Vector(flockWidth / 2, flockHeight / 2, flockDepth / 2)));
+    flock.add(new Boid(new Vector(flockWidth / 2, flockHeight / 2, flockDepth / 2), representation, renderMode));
+   
 }
 
 void draw() {
@@ -168,6 +172,12 @@ void keyPressed() {
   case 'v':
     avoidWalls = !avoidWalls;
     break;
+  case 'r':
+    representation=!representation;
+    println("Representation: "+ (representation ? "VertexVertex" : "FaceVertex"));
+  case 'm':
+    renderMode=!renderMode;
+    println("Render mode: "+ (renderMode ? "inmediato" : "retenido"));
   case ' ':
     if (scene.eye().reference() != null)
       resetEye();
