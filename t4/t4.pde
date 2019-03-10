@@ -7,20 +7,25 @@ import frames.processing.*;
 Scene scene;
 AxisPlaneConstraint constraint = new AxisPlaneConstraint();
 
+boolean s;
 int w=50;
 int h=350;
 boolean mostrar=true;
 PImage img;
 PImage imgbg; ///imagen background
 Frame conilu;  //frame default
+Shape bici;
 int x,y;
-Bici bici;
  
 void setup(){
   size(1000, 600, P3D);
   img=loadImage("calle.jpg");
   imgbg=loadImage("cielo3.jpg");
+  s=true;
   scene = new Scene(this);
+  bici=new Shape(scene);
+  bici.setGraphics(drawBici());
+  bici.randomize();
   scene.setFieldOfView(PI / 3);
   scene.setRadius(400);
   scene.fitBallInterpolation();
@@ -28,22 +33,16 @@ void setup(){
   scene.eye().setConstraint(constraint);
   conilu=new Frame(scene);
   conilu=scene.eye().get();
-  bici=new Bici(new Vector(0,300,0));
-  x=0;
-  y=0;
 }
 
 void draw(){
-  background(imgbg);//255,255,255);// reinicia el fondo a blanco
+  //255,255,255);// reinicia el fondo a blanco
+  background(imgbg);
   sphere(7);  //centro
   lights();
-  pushStyle();
-  noStroke();       //sin lineas de borde
-  fill(151, 110, 255);  //color relleno
+  
   drawBox();
-  popStyle();
-  conilu=scene.eye().get();
-  bici.render();
+  //shapeBici.translate(50,50,0);
   fill(255, 255, 255);    //color texto
   scene.beginHUD();
   scene.disableDepthTest();
@@ -52,6 +51,9 @@ void draw(){
   scene.endHUD();
 }
 void drawBox(){    //dibuja el cubo
+  pushStyle();
+  noStroke();       //sin lineas de borde
+  fill(151, 110, 255);  //color relleno
   rotateX(radians(-27));
   rotateY(radians(-31));
   texture(img);
@@ -107,6 +109,36 @@ void drawBox(){    //dibuja el cubo
   translate(0,-h/2,-h/2);
   box(h+w,w,w);  //h b t
   popMatrix();
+  popStyle();
+}
+
+
+PShape drawBici(){
+  PShape shapeBici=createShape(GROUP); 
+  pushStyle();
+  noFill();
+  strokeWeight(7);
+  ellipseMode(CENTER);
+  PShape silla=createShape();
+  silla.beginShape(TRIANGLE_STRIP);
+  silla.vertex(20,-50,10);
+  silla.vertex(20,-50,-10);
+  silla.vertex(35,-50,0);
+  silla.vertex(20,-45,10);
+  silla.vertex(20,-45,-10);
+  silla.endShape(CLOSE);
+  silla.setFill(color(0));
+  shapeBici.addChild(silla);
+  shapeBici.addChild(createShape(ELLIPSE,0,0,25,25));//rueda de atras
+  shapeBici.addChild(createShape(ELLIPSE,50,-10,45,45)); //rueda de adelante
+  pushStyle();
+  stroke(128,0,0);
+  shapeBici.addChild(createShape(LINE,50,-10,0,50,-65,0));  //vertical
+  shapeBici.addChild(createShape(LINE,50,-65,20,50,-65,-20));  //horizontal
+  shapeBici.addChild(createShape(ARC,50, 0, 100, 100, PI, PI+HALF_PI)); //arco
+  popStyle();
+  shape(shapeBici);
+  return shapeBici;
 }
 
 void mouseClicked() {
@@ -118,8 +150,10 @@ void keyPressed() {
   switch (key) {
   case ' ':
     println("reset scene");
-     scene.setEye(conilu);
-    // scene.eye().setReference(conilu);
+     scene.eye().resetReference();
+     scene.setEye(conilu.get());
+     //scene.lookAt(scene.center());
+     scene.fitBallInterpolation();
     break;
   case 'r':
     constraint.setRotationConstraintType(nextRotationConstraintType(constraint.rotationConstraintType()));    
