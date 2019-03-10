@@ -30,5 +30,6 @@ Complete la tabla:
 
 ## Comandos agregados
 [r] cambia tipo de representación, disponible VertexVertex y FaceVertex, por defecto VertexVertex.
+
 [m] cambia modo de renderización, por defecto inmediato.
 
