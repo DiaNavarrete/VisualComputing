@@ -10,20 +10,23 @@ AxisPlaneConstraint constraint = new AxisPlaneConstraint();
 int w=50;
 int h=350;
 boolean mostrar=true;
-PImage img;
-PImage imgbg; ///imagen background
+PImage img, piedra, zebra, rueda, imgbg; ///imagen background
 Frame conilu;  //frame default
 PShape bici;
 ArrayList<Integer> direcciones;
 ArrayList<String> dirname;
-int x,y;
+int x,y, vel;
 int dir;  //0r, 1u,2l, 3d
  
 void setup(){
   size(1000, 600, P3D);
+  imgbg=loadImage("cielo.jpg");
   img=loadImage("calle.jpg");
-  imgbg=loadImage("cielo3.jpg");
+  piedra=loadImage("piedra.jpg");
+  zebra=loadImage("zebra.jpg");
+  //rueda=loadImage("rueda.png");
   dir=0;
+  vel=1;
   direcciones=new ArrayList();
   direcciones.add(RIGHT);
   direcciones.add(UP);
@@ -55,74 +58,97 @@ void draw(){
   controlMove();
   pushMatrix();
   translate(-h/2+x,-h/2-w/4,h/2+w/4+y);
-  rotateY(dir*HALF_PI);
-  shape(bici);
+  rotateY(dir*HALF_PI);  //giro para la bici
+  shape(bici);    //pinta la bici
   popMatrix();
+  noLights();
   fill(255, 255, 255);    //color texto
   scene.beginHUD();
-  scene.disableDepthTest();
   displayText();
-  scene.enableDepthTest();
   scene.endHUD();
 }
 void drawBox(){    //dibuja el cubo
+  PShape via;
+  textureMode(IMAGE);
   pushStyle();
   noStroke();       //sin lineas de borde
   fill(151, 110, 255);  //color relleno
   rotateX(radians(-27));
   rotateY(radians(-31));
-  texture(img);
-  //h-v f-b-r-l d-t   (horizontal,vertical, front,back,rigth,left,down,top) 
+  //h-v-f-b-r-l-d-t =>  (horizontal,vertical, front,back,rigth,left,down,top) 
   pushMatrix();
   translate(h/2,0,h/2);
-  box(w, h+w,w);  //v f r
+  via=createShape(BOX,w, h-w,w);  //v f r
+  via.setTexture(piedra);
+  shape(via);
   popMatrix();
   pushMatrix();
   translate(0,-h/2,h/2);
-  box(h+w,w,w);  //h f t    
-  popMatrix();
-  //fill(200,0,255);
-  scene.disableDepthTest();
-  pushMatrix();
-  translate(0,h/2,-h/2);
-  box(h-w,w,w);  //h b d
-  popMatrix();
-  pushMatrix();
-  translate(-h/2,0,-h/2);
-  box(w, h+w,w);  //v b l
-  popMatrix();
-  scene.enableDepthTest();
-  pushMatrix();
-  translate(-h/2,h/2,0);
-  box(w, w,h-w);  //h l d
-  popMatrix();
-  pushMatrix();
-  translate(0,h/2,h/2);
-  box(h+w,w,w);  //h f d    
-  popMatrix();
-  pushMatrix();
-  translate(h/2,h/2,0);
-  box(w, w,h+w);  //h r d
-  popMatrix();
-  pushMatrix();
-  translate(h/2,0,-h/2);
-  box(w, h+w,w);  //v b r
-  popMatrix();
-  pushMatrix();
-  translate(-h/2,0,h/2);
-  box(w, h+w,w);  //v f l
+  via=createShape(BOX,h+w,w,w);  //h f t    
+  via.setTexture(img);
+  shape(via);
   popMatrix();
   pushMatrix();
   translate(h/2,-h/2,0);
-  box(w, w,h+w);  //h r t
+  via=createShape(BOX,w, w,h-w);  //h r t
+  via.setTexture(zebra);
+  shape(via);
+  popMatrix();
+  scene.disableDepthTest();
+  pushMatrix();
+  translate(0,h/2,-h/2);
+  via=createShape(BOX,h+w,w,w);  //h b d
+  via.setTexture(img);
+  shape(via);
+  popMatrix();
+  pushMatrix();
+  translate(-h/2,h/2,0);
+  via=createShape(BOX,w, w,h-w);  //h l d
+  via.setTexture(zebra);
+  shape(via);
+  popMatrix();
+  pushMatrix();
+  translate(-h/2,0,-h/2);
+  via=createShape(BOX,w, h-w,w);  //v b l
+  via.setTexture(piedra);
+  shape(via);
+  popMatrix();
+  scene.enableDepthTest();
+  pushMatrix();
+  translate(0,h/2,h/2);
+  via=createShape(BOX,h+w,w,w);  //h f d    
+  via.setTexture(img);
+  shape(via);
+  popMatrix();
+  pushMatrix();
+  translate(h/2,h/2,0);
+  via=createShape(BOX,w, w,h-w);  //h r d
+  via.setTexture(zebra); //setFill(color(107,110,117)
+  shape(via);
+  popMatrix();
+  pushMatrix();
+  translate(h/2,0,-h/2);
+  via=createShape(BOX,w, h-w,w);  //v b r
+  via.setTexture(piedra);
+  shape(via);
+  popMatrix();
+  pushMatrix();
+  translate(-h/2,0,h/2);
+  via=createShape(BOX,w, h-w,w);  //v f l
+  via.setTexture(piedra);
+  shape(via);
   popMatrix();
   pushMatrix();
   translate(-h/2,-h/2,0);
-  box(w, w,h+w);  //h l t
+  via=createShape(BOX,w, w,h-w);  //h l t
+  via.setTexture(zebra);
+  shape(via);
   popMatrix();
   pushMatrix();
   translate(0,-h/2,-h/2);
-  box(h+w,w,w);  //h b t
+  via=createShape(BOX,h+w,w,w);  //h b t
+  via.setTexture(img);
+  shape(via);
   popMatrix();
   popStyle();
 }
@@ -146,6 +172,7 @@ PShape drawBici(){
   silla.vertex(0,-52,0);
   silla.endShape(CLOSE);
   silla.setFill(color(0));
+  PShape r=createShape(ELLIPSE,15,-29,30,30);
   shapeBici.addChild(silla);
   //shapeBici.addChild(createShape(LINE,-0,-25,0,0,-50,0));
   shapeBici.addChild(createShape(ELLIPSE,-18,-22,17,17));//rueda de atras
@@ -161,10 +188,10 @@ PShape drawBici(){
 
 void controlMove(){  //mover mientras se mantenga oprimida la tecla
   if(keyPressed){
-    if(keyCode==RIGHT) x+=1;
-    else if(keyCode==LEFT) x-=1;
-    else if(keyCode==UP) y-=1;
-    else if(keyCode==DOWN) y+=1;
+    if(keyCode==RIGHT && x<340) x+=vel;
+    else if(keyCode==LEFT && x>5) x-=vel;
+    else if(keyCode==UP && y >-345) y-=vel;
+    else if(keyCode==DOWN && y <-18) y+=vel;
   }
 }
 void mouseClicked() {
@@ -185,16 +212,21 @@ void keyPressed() {
     constraint.setRotationConstraintType(nextRotationConstraintType(constraint.rotationConstraintType()));    
     constraint.setRotationConstraintDirection(new Vector(0.0f, 1.0f, 0.0f));  //restricción de giro solo horizontal
     break;
+  case 'v':
+    vel=vel%3+1;
+    break;
   case CODED:
     println(dir);
     int newdir=direcciones.indexOf(keyCode);
-    int dif=abs(dir-newdir);
-    if(dif==1||dif==3) dir=newdir;
-    if(keyCode==UP) y+=1;
+    if(newdir>-1){
+      int dif=abs(dir-newdir);
+      if(dif==1||dif==3) dir=newdir;
+    }
+   /* if(keyCode==UP) y+=1;
     else if(keyCode==UP) y-=1;
     else if(keyCode==DOWN) y+=1;
     else if(keyCode==LEFT) x-=1;
-    else if(keyCode==RIGHT) x+=1;
+    else if(keyCode==RIGHT) x+=1;*/
     println(x,y);
   }
 }
@@ -245,8 +277,9 @@ void displayType(AxisPlaneConstraint.Type type, int x, int y, String c) {
 }
 
 void displayText() {
-  displayType(constraint.rotationConstraintType(), 30, 50, "Rotate (R)=");
-  text("Restart (Espace)", 30, 65);
+  displayType(constraint.rotationConstraintType(), 30, 50, "Rotate ( R )=");
+  text("Restart ( Espace )", 30, 65);
   text("Bicycle direction: "+ dirname.get(dir), 30,80);
+  text("Bicycle velocity ( V ): "+vel + "x", 30,95);
   
 }
