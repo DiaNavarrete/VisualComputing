@@ -7,25 +7,35 @@ import frames.processing.*;
 Scene scene;
 AxisPlaneConstraint constraint = new AxisPlaneConstraint();
 
-boolean s;
 int w=50;
 int h=350;
 boolean mostrar=true;
 PImage img;
 PImage imgbg; ///imagen background
 Frame conilu;  //frame default
-Shape bici;
+PShape bici;
+ArrayList<Integer> direcciones;
+ArrayList<String> dirname;
 int x,y;
+int dir;  //0r, 1u,2l, 3d
  
 void setup(){
   size(1000, 600, P3D);
   img=loadImage("calle.jpg");
   imgbg=loadImage("cielo3.jpg");
-  s=true;
+  dir=0;
+  direcciones=new ArrayList();
+  direcciones.add(RIGHT);
+  direcciones.add(UP);
+  direcciones.add(LEFT);
+  direcciones.add(DOWN);
+  dirname=new ArrayList();
+  dirname.add("RIGHT");
+  dirname.add("UP");
+  dirname.add("LEFT");
+  dirname.add("DOWN");
+  bici=drawBici();
   scene = new Scene(this);
-  bici=new Shape(scene);
-  bici.setGraphics(drawBici());
-  bici.randomize();
   scene.setFieldOfView(PI / 3);
   scene.setRadius(400);
   scene.fitBallInterpolation();
@@ -38,11 +48,16 @@ void setup(){
 void draw(){
   //255,255,255);// reinicia el fondo a blanco
   background(imgbg);
+  noFill();
   sphere(7);  //centro
   lights();
-  
   drawBox();
-  //shapeBici.translate(50,50,0);
+  controlMove();
+  pushMatrix();
+  translate(-h/2+x,-h/2-w/4,h/2+w/4+y);
+  rotateY(dir*HALF_PI);
+  shape(bici);
+  popMatrix();
   fill(255, 255, 255);    //color texto
   scene.beginHUD();
   scene.disableDepthTest();
@@ -117,30 +132,41 @@ PShape drawBici(){
   PShape shapeBici=createShape(GROUP); 
   pushStyle();
   noFill();
-  strokeWeight(7);
+  strokeWeight(5);
   ellipseMode(CENTER);
   PShape silla=createShape();
   silla.beginShape(TRIANGLE_STRIP);
-  silla.vertex(20,-50,10);
-  silla.vertex(20,-50,-10);
-  silla.vertex(35,-50,0);
-  silla.vertex(20,-45,10);
-  silla.vertex(20,-45,-10);
+  silla.vertex(-10,-53,5);
+  silla.vertex(-10,-53,-5);
+  silla.vertex(0,-52,0);
+  silla.vertex(-10,-48,5);
+  silla.vertex(-10,-53,5);
+  silla.vertex(-10,-48,-5);
+  silla.vertex(-10,-53,-5);
+  silla.vertex(0,-52,0);
   silla.endShape(CLOSE);
   silla.setFill(color(0));
   shapeBici.addChild(silla);
-  shapeBici.addChild(createShape(ELLIPSE,0,0,25,25));//rueda de atras
-  shapeBici.addChild(createShape(ELLIPSE,50,-10,45,45)); //rueda de adelante
+  //shapeBici.addChild(createShape(LINE,-0,-25,0,0,-50,0));
+  shapeBici.addChild(createShape(ELLIPSE,-18,-22,17,17));//rueda de atras
+  shapeBici.addChild(createShape(ELLIPSE,15,-29,30,30)); //rueda de adelante
   pushStyle();
   stroke(128,0,0);
-  shapeBici.addChild(createShape(LINE,50,-10,0,50,-65,0));  //vertical
-  shapeBici.addChild(createShape(LINE,50,-65,20,50,-65,-20));  //horizontal
-  shapeBici.addChild(createShape(ARC,50, 0, 100, 100, PI, PI+HALF_PI)); //arco
+  shapeBici.addChild(createShape(LINE,15,-28,0,15,-60,0));  //vertical
+  shapeBici.addChild(createShape(LINE,15,-60,15,15,-60,-15));  //horizontal
+  shapeBici.addChild(createShape(ARC,15, -23, 67, 65, PI, PI+HALF_PI)); //arco
   popStyle();
-  shape(shapeBici);
   return shapeBici;
 }
 
+void controlMove(){  //mover mientras se mantenga oprimida la tecla
+  if(keyPressed){
+    if(keyCode==RIGHT) x+=1;
+    else if(keyCode==LEFT) x-=1;
+    else if(keyCode==UP) y-=1;
+    else if(keyCode==DOWN) y+=1;
+  }
+}
 void mouseClicked() {
   mostrar=!mostrar;
  // scene.setEye(conilu);
@@ -157,17 +183,19 @@ void keyPressed() {
     break;
   case 'r':
     constraint.setRotationConstraintType(nextRotationConstraintType(constraint.rotationConstraintType()));    
-    Vector dir = new Vector(0.0f, 1.0f, 0.0f);
-    constraint.setRotationConstraintDirection(dir);
+    constraint.setRotationConstraintDirection(new Vector(0.0f, 1.0f, 0.0f));  //restricción de giro solo horizontal
     break;
   case CODED:
+    println(dir);
+    int newdir=direcciones.indexOf(keyCode);
+    int dif=abs(dir-newdir);
+    if(dif==1||dif==3) dir=newdir;
     if(keyCode==UP) y+=1;
-    else if(keyCode==UP) y+=1;
-    else if(keyCode==DOWN) y-=1;
+    else if(keyCode==UP) y-=1;
+    else if(keyCode==DOWN) y+=1;
     else if(keyCode==LEFT) x-=1;
     else if(keyCode==RIGHT) x+=1;
     println(x,y);
-    break;
   }
 }
 
@@ -218,5 +246,7 @@ void displayType(AxisPlaneConstraint.Type type, int x, int y, String c) {
 
 void displayText() {
   displayType(constraint.rotationConstraintType(), 30, 50, "Rotate (R)=");
-
+  text("Restart (Espace)", 30, 65);
+  text("Bicycle direction: "+ dirname.get(dir), 30,80);
+  
 }
