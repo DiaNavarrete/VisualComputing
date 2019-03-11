@@ -6,7 +6,7 @@ import frames.processing.*;
 
 Scene scene;
 AxisPlaneConstraint constraint = new AxisPlaneConstraint();
-
+PShader shader;
 int w=50;
 int h=350;
 boolean mostrar=true;
@@ -16,6 +16,7 @@ PShape bici;
 ArrayList<Integer> direcciones;
 ArrayList<String> dirname;
 int x,y, vel;
+boolean ilusion;
 int dir;  //0r, 1u,2l, 3d
  
 void setup(){
@@ -27,6 +28,7 @@ void setup(){
   //rueda=loadImage("rueda.png");
   dir=0;
   vel=1;
+  ilusion=true;
   direcciones=new ArrayList();
   direcciones.add(RIGHT);
   direcciones.add(UP);
@@ -44,16 +46,20 @@ void setup(){
   scene.fitBallInterpolation();
   constraint = new LocalConstraint();
   scene.eye().setConstraint(constraint);
+  shader=loadShader("frag.glsl","vert.glsl");
   conilu=new Frame(scene);
   conilu=scene.eye().get();
+ // scene.setTrackedFrame(hid, conilu);
 }
 
 void draw(){
   //255,255,255);// reinicia el fondo a blanco
   background(imgbg);
+  shader(shader);
+  pointLight(255,255,255,w/2,h,200);
   noFill();
   sphere(7);  //centro
-  lights();
+  //lights();
   drawBox();
   controlMove();
   pushMatrix();
@@ -94,7 +100,7 @@ void drawBox(){    //dibuja el cubo
   via.setTexture(zebra);
   shape(via);
   popMatrix();
-  scene.disableDepthTest();
+  if(ilusion) scene.disableDepthTest();
   pushMatrix();
   translate(0,h/2,-h/2);
   via=createShape(BOX,h+w,w,w);  //h b d
@@ -113,7 +119,7 @@ void drawBox(){    //dibuja el cubo
   via.setTexture(piedra);
   shape(via);
   popMatrix();
-  scene.enableDepthTest();
+  if(ilusion) scene.enableDepthTest();
   pushMatrix();
   translate(0,h/2,h/2);
   via=createShape(BOX,h+w,w,w);  //h f d    
@@ -208,6 +214,9 @@ void keyPressed() {
      //scene.lookAt(scene.center());
      scene.fitBallInterpolation();
     break;
+  case 'i':
+    ilusion=!ilusion;
+    break;
   case 'r':
     constraint.setRotationConstraintType(nextRotationConstraintType(constraint.rotationConstraintType()));    
     constraint.setRotationConstraintDirection(new Vector(0.0f, 1.0f, 0.0f));  //restricción de giro solo horizontal
@@ -279,7 +288,8 @@ void displayType(AxisPlaneConstraint.Type type, int x, int y, String c) {
 void displayText() {
   displayType(constraint.rotationConstraintType(), 30, 50, "Rotate ( R )=");
   text("Restart ( Espace )", 30, 65);
-  text("Bicycle direction: "+ dirname.get(dir), 30,80);
+  text("See ilusion ( I ): " + (ilusion?"enabled":"disabled"),30,80);
   text("Bicycle velocity ( V ): "+vel + "x", 30,95);
+  text("Bicycle direction: "+ dirname.get(dir), 30,110);
   
 }
